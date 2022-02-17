@@ -74,7 +74,7 @@ def query():
         query_obj = create_query("*", [], sort, sortDir)
 
     print("query obj: {}".format(query_obj))
-    response = client.search(
+    response = opensearch.search(
     body=query_obj,
     index='bbuy_products'
 )   # TODO: Replace me with an appropriate call to OpenSearch
