@@ -31,6 +31,8 @@ def process_filters(filters_input):
         if type == "range":
             pass
         elif type == "terms":
+            filters.append("{\"term\": "+filter+"}}")
+            display_filters.append(display_name)
             pass #TODO: IMPLEMENT
     print("Filters: {}".format(filters))
 
@@ -94,10 +96,26 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     query_obj = {
         'size': 10,
         "query": {
-            "match_all": {} # Replace me with a query that both searches and filters
+            "match_all": {},
+            "filter": {
+                "bool": {
+                    "must":
+                        process_filters(filters) # Replace me with a query that both searches and filters
+        }
+            }
         },
         "aggs": {
             #TODO: FILL ME IN
         }
     }
     return query_obj
+
+# "filter": {
+#     "bool": {
+#         "must": [
+#             {"term": {"isActive": "1"}},
+#             {"term": {"isPrivate": "0"}},
+#             {"term": {"isOwner": "1"}}
+#         ]
+#     }
+# }
