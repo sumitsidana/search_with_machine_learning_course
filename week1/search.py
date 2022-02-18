@@ -19,21 +19,22 @@ def process_filters(filters_input):
     filters = []
     display_filters = []  # Also create the text we will use to display the filters that are applied
     applied_filters = ""
-    for filter in filters_input:
-        type = request.args.get(filter + ".type")
-        display_name = request.args.get(filter + ".displayName", filter)
-        #
-        # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
-        applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
-                                                                                 display_name)
-        #TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
-        # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
-        if type == "range":
-            pass
-        elif type == "terms":
-            filters.append("{\"term\": "+filter+"}}")
-            display_filters.append(display_name)
-            pass #TODO: IMPLEMENT
+    if (filters_input):
+        for filter in filters_input:
+            type = request.args.get(filter + ".type")
+            display_name = request.args.get(filter + ".displayName", filter)
+            #
+            # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
+            applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
+                                                                                    display_name)
+            #TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
+            # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
+            if type == "range":
+                pass
+            elif type == "terms":
+                filters.append("{\"term\": "+filter+"}}")
+                display_filters.append(display_name)
+                pass #TODO: IMPLEMENT
     print("Filters: {}".format(filters))
 
     return filters, display_filters, applied_filters
@@ -96,16 +97,25 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     query_obj = {
         'size': 10,
         "query": {
-            "match_all": {},
+            "function_score": {
+                 "query" : {
+                                "bool": {
+                    "must": [
+                        {"match_all": {}}
+                    ],
             "filter": {
                 "bool": {
                     "must":
                         process_filters(filters) # Replace me with a query that both searches and filters
+                }
         }
-            }
-        },
+                                }}
+            
+        ,
         "aggs": {
             #TODO: FILL ME IN
+        }
+        }
         }
     }
     return query_obj
