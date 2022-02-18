@@ -34,6 +34,7 @@ def process_filters(filters_input):
             elif type == "terms":
                 filters.append("{\"term\": "+filter+"}}")
                 display_filters.append(display_name)
+                print(filters)
                 pass #TODO: IMPLEMENT
     print("Filters: {}".format(filters))
 
@@ -92,34 +93,56 @@ def query():
         redirect(url_for("index"))
 
 
+# def create_query(user_query, filters, sort="_score", sortDir="desc"):
+#     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
+#     query_obj = {
+#         'size': 10,
+#         "query": {
+#             "function_score": {
+#                  "query" : {
+#                                 "bool": {
+#                     "must": [
+#                         {"match_all": {}}
+#                     ],
+#             "filter": {
+#                 "bool": {
+#                     "must":
+#                         process_filters(filters) # Replace me with a query that both searches and filters
+#                 }
+#         }
+#                                 }}
+            
+#         ,
+#         "aggs": {
+#             #TODO: FILL ME IN
+#         }
+#         }
+#         }
+#     }
+#     print(query_obj)
+#     return query_obj
+
 def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
     query_obj = {
         'size': 10,
-        "query": {
-            "function_score": {
-                 "query" : {
-                                "bool": {
-                    "must": [
-                        {"match_all": {}}
-                    ],
-            "filter": {
-                "bool": {
-                    "must":
-                        process_filters(filters) # Replace me with a query that both searches and filters
-                }
-        }
-                                }}
-            
-        ,
+  "query": {
+    
+      "bool":{
+        "must":[
+            {"query_string": {
+                "query": user_query,
+                "fields": ["name^100", "shortDescription^50", "longDescription^10", "department"]
+            }}
+        ]
+        
+      }
+  },
         "aggs": {
             #TODO: FILL ME IN
         }
-        }
-        }
     }
     return query_obj
-
 # "filter": {
 #     "bool": {
 #         "must": [
