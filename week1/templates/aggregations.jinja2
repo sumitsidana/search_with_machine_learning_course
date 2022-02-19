@@ -20,9 +20,11 @@
       {% endfor %}
     {% endif %}
   </div>
+
   {#Add in Department aggregation display here #}
-  <div class="aggregations-result">
+  {# <div class="aggregations-result">
     <div class="agg-header">Missing Data</div>
     <div>image: {{ search_response.aggregations.missing_images.doc_count }}</div>
-  </div>{% endif %}
+  </div> #}
+  {% endif %}
 </div>

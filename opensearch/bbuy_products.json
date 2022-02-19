@@ -5,7 +5,8 @@
   
     "mappings": {
       "properties": {
-        "price": {"type": "float"}
+        "price": {"type": "float"},
+        "regularPrice": {"type": "float"}
     }
     }
   }
