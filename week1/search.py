@@ -139,6 +139,25 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
       }
   },
         "aggs": {
+
+            "regularPrice": {
+                "range": {
+                    "field": "regularPrice",
+                    "ranges": [
+                    {
+                        "from": 0,
+                        "to": 100
+                    },
+                    {
+                        "from": 100,
+                        "to": 500
+                    },
+                    {
+                        "from": 500
+                    }
+                    ]
+                }
+            }
             #TODO: FILL ME IN
         }
     }

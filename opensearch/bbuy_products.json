@@ -1,5 +1,11 @@
 {
   "settings": {
     "index.refresh_interval": "5s"
+  },
+  
+    "mappings": {
+      "properties": {
+        "price": {"type": "float"}
+    }
+    }
   }
-}
