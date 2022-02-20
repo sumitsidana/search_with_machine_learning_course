@@ -22,20 +22,54 @@ def process_filters(filters_input):
     if (filters_input):
         for filter in filters_input:
             type = request.args.get(filter + ".type")
+            filter_to = request.args.get(filter + ".to")
+            filter_from = request.args.get(filter + ".from")
+            filter_name = request.args.get(filter + ".name")
+            filter_key = request.args.get(filter + ".key")
             display_name = request.args.get(filter + ".displayName", filter)
             #
             # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
-            applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
-                                                                                    display_name)
+            # applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
+            #                                                                         display_name)
+                        
             #TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
             # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
             if type == "range":
-                pass
+                display_filters.append("filter.name={}, type={}, from={}, to={}".format(filter, type, filter_from, filter_to))
+                applied_filters += "&filter.name={}&{}.type={}&{}.from={}&{}.to={}&{}.key={}&{}.displayName={}".format(
+                    filter, filter, type, filter, filter_from, filter, filter_to, filter, filter_key, filter, display_name)
+                
             elif type == "terms":
-                filters.append("{\"term\": "+filter+"}}")
-                display_filters.append(display_name)
-                print(filters)
-                pass #TODO: IMPLEMENT
+                display_filters.append("filter.name={}, type={}, key={}".format(filter, type, filter_key))
+                applied_filters += "&filter.name={}&{}.type={}&{}.key={}&{}.displayName={}".format(
+                    filter, filter, type, filter, filter_key, filter, display_name)
+            if type == "range":
+                range_filter = ""
+                if filter_from and filter_to:
+                    range_filter = {
+                        "range": {
+                            filter: {
+                                "gte": filter_from,
+                                "lt": filter_to
+                            }
+                        }
+                    }
+                elif filter_from:
+                    range_filter = {
+                        "range": {
+                            filter: {
+                                "gte": filter_from
+                            }
+                        }
+                    }
+                filters.append(range_filter)
+            elif type == "terms":
+                terms_filter = {
+                    "term": {
+                        filter + ".keyword": filter_key
+                    }
+                }
+                filters.append(terms_filter)
     print("Filters: {}".format(filters))
 
     return filters, display_filters, applied_filters
@@ -124,6 +158,10 @@ def query():
 
 def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
+    if user_query == '*':
+        match_query_obj = {
+            "match_all": {}
+        }
     query_obj = {
         'size': 10,
   "query": {
