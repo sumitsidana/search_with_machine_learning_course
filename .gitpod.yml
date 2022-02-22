@@ -24,11 +24,3 @@ ports:
     onOpen: ignore
   - port: 9602
     onOpen: ignore
-tasks:
-    - name: Install ipykernel
-      command: pip install ipykernel
-vscode:
-  extensions:
-    - github.vscode-pull-request-github
-    - ms-toolsai.jupyter
-    - ms-python.python
