@@ -9,7 +9,7 @@ def create_rescore_ltr_query(user_query, query_obj, click_prior_query, ltr_model
     #add on the rescore
     #print("IMPLEMENT ME: create_rescore_ltr_query")
     query_obj["rescore"] = {
-        "window_size": 10,
+        "window_size": rescore_size,
         "query": {
             "rescore_query": {
                 "sltr": {
@@ -18,11 +18,13 @@ def create_rescore_ltr_query(user_query, query_obj, click_prior_query, ltr_model
                     },
                     "model": ltr_model_name,
                     # Since we are using a named store, as opposed to simply '_ltr', we need to pass it in
-                    "store": ltr_store_name,
-                    "active_features": active_features
+                    "store": ltr_store_name
                 }
             },
-            "rescore_query_weight": rescore_query_weight # Magic number, but let's say LTR matches are 2x baseline matches
+            # "rescore_query_weight": rescore_query_weight # Magic number, but let's say LTR matches are 2x baseline matches
+            "score_mode": "total",
+            "query_weight": main_query_weight,
+            "rescore_query_weight": rescore_query_weight,  # Magic number, but let's say LTR matches are 2x baseline matches
         }
     }
     return query_obj
@@ -74,7 +76,7 @@ def create_feature_log_query(query, doc_ids, click_prior_query, featureset_name,
                     "filter": [  # use a filter so that we don't actually score anything
                         {
                             "terms": {
-                                "_id": [doc_ids]
+                                "_id": doc_ids
                             }
                         },
                         {  # use the LTR query bring in the LTR feature set
@@ -100,7 +102,7 @@ def create_feature_log_query(query, doc_ids, click_prior_query, featureset_name,
                 }
             }
         }
-    print(query_obj)
+    # print(query_obj)
     return query_obj
 
 
