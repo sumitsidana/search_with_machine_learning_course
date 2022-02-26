@@ -248,8 +248,11 @@ class DataPrepper:
             'doc_id': hit['_id'],
             'sku': hit['_source']['sku'][0],
             'query_id': query_id,
+            'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None),
+            'name_phrase_match': hit['fields']['_ltrlog'][0]['log_entry'][1].get("Value", None),
+            'name_hyphens_min_df': hit['fields']['_ltrlog'][0]['log_entry'][2].get("Value", None),
             'salePrice': hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None),
-            'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None)
+            'regularPrice': hit['fields']['_ltrlog'][0]['log_entry'][4].get("Value", None)
             #... key:value pairs from the doc's 'log_entry' (concatenate)
             }
             # print(doc_features_list)
