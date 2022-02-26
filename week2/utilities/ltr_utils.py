@@ -4,7 +4,7 @@ import requests
 
 
 def create_rescore_ltr_query(user_query, query_obj, click_prior_query, ltr_model_name, ltr_store_name,
-                             active_features=None, rescore_size=500, main_query_weight=1, rescore_query_weight=2):
+                             active_features=None, rescore_size=500, main_query_weight=1, rescore_query_weight=100):
     # Create the base query, use a much bigger window
     #add on the rescore
     #print("IMPLEMENT ME: create_rescore_ltr_query")
@@ -14,7 +14,8 @@ def create_rescore_ltr_query(user_query, query_obj, click_prior_query, ltr_model
             "rescore_query": {
                 "sltr": {
                     "params": {
-                        "keywords": user_query
+                        "keywords": user_query,
+                        "click_prior_query": click_prior_query,
                     },
                     "model": ltr_model_name,
                     # Since we are using a named store, as opposed to simply '_ltr', we need to pass it in
@@ -85,7 +86,8 @@ def create_feature_log_query(query, doc_ids, click_prior_query, featureset_name,
                                 "featureset": featureset_name,
                                 "store": ltr_store_name,
                                 "params": {
-                                    "keywords": query
+                                    "keywords": query,
+                                    "click_prior_query": click_prior_query,
                                 }
                             }
                         }

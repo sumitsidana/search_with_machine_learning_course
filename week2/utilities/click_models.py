@@ -8,7 +8,7 @@ def binary_func(x):
     return 0
 
 def step(x):
-    print("IMPLEMENT ME: step(x) a step function with a simple heuristic that buckets grades")
+    # print("IMPLEMENT ME: step(x) a step function with a simple heuristic that buckets grades")
     if (x <= 0.05):
         return 0.0
     elif ((x > 0.05) and (x <= 0.10)):
@@ -36,7 +36,8 @@ def apply_click_model(data_frame, click_model_type="binary", downsample=True):
             data_frame = down_sample_continuous(data_frame)
     elif click_model_type == "heuristic":
         data_frame["grade"] = (data_frame["clicks"]/data_frame["num_impressions"]).fillna(0).apply(lambda x: step(x))
-        data_frame = down_sample_buckets(data_frame)
+        if downsample:
+            data_frame = down_sample_buckets(data_frame)
         # print("IMPLEMENT ME: apply_click_model(): downsampling")
     return data_frame
 
