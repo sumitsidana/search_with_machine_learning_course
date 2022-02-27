@@ -238,27 +238,36 @@ class DataPrepper:
         #print(response)
         hits = response['hits']['hits']
         # List of dictionaries, each one representing a dataframe row
-        docs_features_list = []
+        doc_features_list = []
         for hit in hits:
             # print(hit)
             # print(hit['fields']['_ltrlog'][0]['log_entry'][0]['value'])
             # print(hit['fields']['_ltrlog'][0]['log_entry'][3]['value'])
-            docs_features_list.append(
-            {
-            'doc_id': hit['_id'],
-            'sku': hit['_source']['sku'][0],
-            'query_id': query_id,
-            'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None),
-            'name_phrase_match': hit['fields']['_ltrlog'][0]['log_entry'][1].get("Value", None),
-            'name_hyphens_min_df': hit['fields']['_ltrlog'][0]['log_entry'][2].get("Value", None),
-            'salePrice': hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None),
-            'regularPrice': hit['fields']['_ltrlog'][0]['log_entry'][4].get("Value", None)
-            #... key:value pairs from the doc's 'log_entry' (concatenate)
+            print(hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None))
+            doc_features_dict = {
+                feature.get("name"): feature.get("value", 0)
+                for feature in hit["fields"]["_ltrlog"][0]["log_entry"]
             }
+            doc_features_dict["doc_id"] = hit['_id']
+            doc_features_dict["sku"] = hit['_source']['sku'][0]
+            doc_features_dict["query_id"] = query_id
+            doc_features_list.append(doc_features_dict)
+            # docs_features_list.append(
+            # {
+            # 'doc_id': hit['_id'],
+            # 'sku': hit['_source']['sku'][0],
+            # 'query_id': query_id,
+            # 'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None),
+            # 'name_phrase_match': hit['fields']['_ltrlog'][0]['log_entry'][1].get("Value", None),
+            # 'name_hyphens_min_df': hit['fields']['_ltrlog'][0]['log_entry'][2].get("Value", None),
+            # 'salePrice': hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None),
+            # 'regularPrice': hit['fields']['_ltrlog'][0]['log_entry'][4].get("Value", None)
+            #... key:value pairs from the doc's 'log_entry' (concatenate)
+            # }
             # print(doc_features_list)
-    )
-        frame = pd.DataFrame(docs_features_list)
-        # print(frame)
+    # )
+        frame = pd.DataFrame(doc_features_list)
+        print(frame)
         return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})
         # Loop over the hits structure returned by running `log_query` and then extract out the features from the response per query_id and doc id.  Also capture and return all query/doc pairs that didn't return features
         # Your structure should look like the data frame below

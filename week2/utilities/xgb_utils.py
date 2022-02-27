@@ -28,7 +28,7 @@ def plots(xgb_model, xgb_model_name, xgb_feat_map, xgb_plot):
 def train(xgb_train_data, num_rounds=5, xgb_conf=None ):
     print(xgb_train_data)
     dtrain = xgb.DMatrix(xgb_train_data)
-    print(dtrain)
+    # print(dtrain)
     xgb_params = {'objective': 'reg:logistic'}
     bst = None
     if xgb_conf is not None:
