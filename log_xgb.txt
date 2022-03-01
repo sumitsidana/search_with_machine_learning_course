@@ -1,0 +1,97 @@
+Deleted old store response status: 200
+Create the new store at https://localhost:9200/_ltr/week2 response status: 200
+Installing week2/conf/ltr_featureset.json featureset at https://localhost:9200/_ltr/week2/_featureset/bbuy_main_featureset
+POSTing the featureset to https://localhost:9200/_ltr/week2/_featureset/bbuy_main_featureset
+Featureset Creation: <Response [201]>
+Creating training and test data sets from impressions by splitting on dates
+Splitting: /workspace/datasets/train.csv and writing train to: train.csv and test to: test.csv in /workspace/ltr_output
+Clicks pre filtering: 1865269
+Verify info: flag: validity.csv, path: /workspace/ltr_output/validity.csv, exists: True
+Clicks post filtering: 1703297
+Creating impressions data set
+Writing impressions to file: /workspace/ltr_output/impressions.csv
+Loading impressions from /workspace/ltr_output/impressions.csv
+Logging features
+Progress[0]: 1080p
+Progress[500]: First class
+Progress[1000]: Nikita
+Progress[1500]: Transformers: dark of the moon
+Progress[2000]: droid x
+Progress[2500]: marilyn manson
+Progress[3000]: the shield
+The following queries produced no results: {}
+NAN counts: 14
+Writing XGB Training file with query                  6572
+sku                    6572
+clicks                 6572
+rank                   6572
+num_impressions        6572
+doc_id                 6572
+product_name           6572
+query_id               6572
+name_match             6572
+name_phrase_match      6572
+name_hyphens_min_df    6572
+salePrice              6572
+regularPrice           6572
+grade                  6572
+dtype: int64 rows to /workspace/ltr_output/training.xgb
+Writing feature map to /workspace/ltr_output/xgb-feat-map.txt
+/workspace/ltr_output/training.xgb
+<xgboost.core.DMatrix object at 0x7f1a1cac37f0>
+Training XG Boost on /workspace/ltr_output/training.xgb for 5 rounds with params: {'objective': 'reg:logistic'}
+IMPLEMENT ME: train()
+Dumping out model using feature map: xgb-feat-map.txt
+Saving XGB LTR-ready model to /workspace/ltr_output/xgb_model.model.ltr
+Saving XGB Binary model to /workspace/ltr_output/xgb_model.model
+Deleting model from https://localhost:9200/_ltr/week2/_model/ltr_model
+	Delete Model Response: 404: {"_index":".ltrstore_week2","_type":"store","_id":"model-ltr_model","_version":1,"result":"not_found","_shards":{"total":1,"successful":1,"failed":0},"_seq_no":1,"_primary_term":1}
+Uploading model to https://localhost:9200/_ltr/week2/_featureset/bbuy_main_featureset/_createmodel
+	Upload Model Response: 201: {"_index":".ltrstore_week2","_type":"store","_id":"model-ltr_model","_version":2,"result":"created","forced_refresh":true,"_shards":{"total":1,"successful":1,"failed":0},"_seq_no":2,"_primary_term":1}
+Plotting model quality data
+Plotting trees: 4
+Plotting feature importance
+Unable to plot our models
+Running 200 test queries.
+Progress[0]: visio
+Progress[50]: portable dvd players
+Progress[100]: blue tooth headphones
+Progress[150]: razer
+We've executed 200 queries. Finishing.
+Writing results of test to /workspace/ltr_output/xgb_test_output.csv
+Meta:
+Model name: ltr_model, Store Name: week2, Index: bbuy_products, Precision: 10 
+
+Zero results queries: {'simple': [], 'ltr_simple': [], 'hand_tuned': [], 'ltr_hand_tuned': []}
+
+
+Analyzing results from /workspace/ltr_output/xgb_test_output.csv
+Queries not seen during training: [178]
+                        query
+0                       visio
+1                  Skylanders
+2                       Flyer
+3                    superman
+4    Pirates of the Caribbean
+..                        ...
+173                 kaspersky
+174                      amps
+175                 sd memory
+176            Lifeproof case
+177         bluetooth adapter
+
+[178 rows x 1 columns]
+
+
+Simple MRR is 0.399
+LTR Simple MRR is 0.399
+Hand tuned MRR is 0.454
+LTR Hand Tuned MRR is 0.454
+
+Simple p@10 is 0.153
+LTR simple p@10 is 0.153
+Hand tuned p@10 is 0.195
+LTR hand tuned p@10 is 0.195
+Simple better: 0	LTR_Simple Better: 0	Equal: 2486
+HT better: 11	LTR_HT Better: 49	Equal: 2548
+Saving Better/Equal analysis to /workspace/ltr_output/analysis
