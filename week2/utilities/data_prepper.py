@@ -235,40 +235,48 @@ class DataPrepper:
         # IMPLEMENT_START --
         #print("IMPLEMENT ME: __log_ltr_query_features: Extract log features out of the LTR:EXT response and place in a data frame")
         response = self.opensearch.search(body=log_query, index=self.index_name)
-        #print(response)
-        hits = response['hits']['hits']
-        # List of dictionaries, each one representing a dataframe row
-        doc_features_list = []
-        for hit in hits:
-            # print(hit)
-            # print(hit['fields']['_ltrlog'][0]['log_entry'][0]['value'])
-            # print(hit['fields']['_ltrlog'][0]['log_entry'][3]['value'])
-            print(hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None))
-            doc_features_dict = {
-                feature.get("name"): feature.get("value", 0)
-                for feature in hit["fields"]["_ltrlog"][0]["log_entry"]
-            }
-            doc_features_dict["doc_id"] = hit['_id']
-            doc_features_dict["sku"] = hit['_source']['sku'][0]
-            doc_features_dict["query_id"] = query_id
-            doc_features_list.append(doc_features_dict)
-            # docs_features_list.append(
-            # {
-            # 'doc_id': hit['_id'],
-            # 'sku': hit['_source']['sku'][0],
-            # 'query_id': query_id,
-            # 'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None),
-            # 'name_phrase_match': hit['fields']['_ltrlog'][0]['log_entry'][1].get("Value", None),
-            # 'name_hyphens_min_df': hit['fields']['_ltrlog'][0]['log_entry'][2].get("Value", None),
-            # 'salePrice': hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None),
-            # 'regularPrice': hit['fields']['_ltrlog'][0]['log_entry'][4].get("Value", None)
-            #... key:value pairs from the doc's 'log_entry' (concatenate)
-            # }
-            # print(doc_features_list)
-    # )
-        frame = pd.DataFrame(doc_features_list)
-        print(frame)
-        return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})
+        if response and response['hits']['hits'] and len(response['hits']['hits']) > 0:
+            #print(response)
+            hits = response['hits']['hits']
+            # List of dictionaries, each one representing a dataframe row
+            doc_features_list = []
+            for hit in hits:
+                # print(hit)
+                # print(hit['fields']['_ltrlog'][0]['log_entry'][0]['value'])
+                # print(hit['fields']['_ltrlog'][0]['log_entry'][3]['value'])
+                print(hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None))
+                doc_features_dict = {
+                    feature.get("name"): feature.get("value", 0)
+                    for feature in hit["fields"]["_ltrlog"][0]["log_entry"]
+                }
+                doc_features_dict["doc_id"] = hit['_id']
+                doc_features_dict["sku"] = hit['_source']['sku'][0]
+                doc_features_dict["query_id"] = query_id
+                doc_features_list.append(doc_features_dict)
+                # docs_features_list.append(
+                # {
+                # 'doc_id': hit['_id'],
+                # 'sku': hit['_source']['sku'][0],
+                # 'query_id': query_id,
+                # 'name_match': hit['fields']['_ltrlog'][0]['log_entry'][0].get("Value", None),
+                # 'name_phrase_match': hit['fields']['_ltrlog'][0]['log_entry'][1].get("Value", None),
+                # 'name_hyphens_min_df': hit['fields']['_ltrlog'][0]['log_entry'][2].get("Value", None),
+                # 'salePrice': hit['fields']['_ltrlog'][0]['log_entry'][3].get("Value", None),
+                # 'regularPrice': hit['fields']['_ltrlog'][0]['log_entry'][4].get("Value", None)
+                #... key:value pairs from the doc's 'log_entry' (concatenate)
+                # }
+                # print(doc_features_list)
+        # )
+            frame = pd.DataFrame(doc_features_list)
+            print(frame)
+            return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})
+        else:
+                if response and (response['hits']['hits'] == None or len(response['hits']['hits']) == 0):
+                    print("No results for query: %s" % key)
+                    no_results.add(key)
+                else:
+                    print(response)
+                    print("Invalid response for query %s" % log_query)
         # Loop over the hits structure returned by running `log_query` and then extract out the features from the response per query_id and doc id.  Also capture and return all query/doc pairs that didn't return features
         # Your structure should look like the data frame below
         # feature_results = {}
