@@ -3,9 +3,14 @@ import os
 import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from nltk.stem import SnowballStemmer
 
 def transform_name(product_name):
     # IMPLEMENT
+    product_name = product_name.lower()
+    product_name = product_name.replace("'", " ")
+    stemmer = SnowballStemmer("english") # Choose a language
+    product_name = stemmer.stem(product_name) # Stem a word
     return product_name
 
 # Directory for product data
