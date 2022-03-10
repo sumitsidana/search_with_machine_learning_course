@@ -54,6 +54,17 @@ df['query'] = df['query'].apply(lambda x:x.lower())
 
 # IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
 
+category_value_counts= pd.DataFrame(df['category'].value_counts().reset_index().\
+                                    rename(columns = {"index": "category", "category": "category_count"}))
+faulty_categories = list(category_value_counts[category_value_counts['category_count'] < min_queries]['category'])
+
+while len(faulty_categories) > 0:
+    df.loc[df['category'].isin(faulty_categories), 'category'] = df['category'].\
+    map(parents_df.set_index('category')['parent'])
+    category_value_counts= pd.DataFrame(df['category'].value_counts().reset_index().\
+                                    rename(columns = {"index": "category", "category": "category_count"}))
+    faulty_categories = list(category_value_counts[category_value_counts['category_count'] < min_queries]['category'])
+
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
 
 # Create labels in fastText format.
