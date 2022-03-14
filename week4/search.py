@@ -57,8 +57,21 @@ def process_filters(filters_input):
     return filters, display_filters, applied_filters
 
 def get_query_category(user_query, query_class_model):
-    print("IMPLEMENT ME: get_query_category")
-    return None
+    # print("IMPLEMENT ME: get_query_category")
+    predictions = query_class_model.predict(user_query, k=5)
+    print(predictions)
+    predicted_scores = predictions[1]
+    category_filter = []
+    predicted_sum = 0.0
+    for i, classification in enumerate(predictions[0]):
+        category_filter.append(classification.replace("__label__",""))
+        predicted_sum += predicted_scores[i]
+        if predicted_sum >= 0.5:
+            break
+
+    return category_filter if predicted_sum >= 0.5 else []
+
+    # return None
 
 
 @bp.route('/query', methods=['GET', 'POST'])
@@ -137,13 +150,19 @@ def query():
 
     query_class_model = current_app.config["query_model"]
     query_category = get_query_category(user_query, query_class_model)
-    if query_category is not None:
-        print("IMPLEMENT ME: add this into the filters object so that it gets applied at search time.  This should look like your `term` filter from week 1 for department but for categories instead")
-    #print("query obj: {}".format(query_obj))
+    
+    if len(query_category) != 0:
+        query_obj["query"]["bool"]["filter"].append({
+            "terms": {
+                "categoryPathIds.keyword": query_category
+            }
+        })
+        # print("IMPLEMENT ME: add this into the filters object so that it gets applied at search time.  This should look like your `term` filter from week 1 for department but for categories instead")
+    print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=current_app.config["index_name"], explain=explain)
     # Postprocess results here if you so desire
 
-    #print(response)
+    print(response)
     if error is None:
         return render_template("search_results.jinja2", query=user_query, search_response=response,
                                display_filters=display_filters, applied_filters=applied_filters,
