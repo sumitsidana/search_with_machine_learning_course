@@ -16,7 +16,7 @@ output_file_name = r'/workspace/datasets/labeled_query_data.txt'
 
 parser = argparse.ArgumentParser(description='Process arguments.')
 general = parser.add_argument_group("general")
-general.add_argument("--min_queries", default=1,  help="The minimum number of queries per category label (default is 1)")
+general.add_argument("--min_queries", default=1000,  help="The minimum number of queries per category label (default is 1)")
 general.add_argument("--output", default=output_file_name, help="the file to output to")
 
 args = parser.parse_args()
@@ -24,6 +24,7 @@ output_file_name = args.output
 
 if args.min_queries:
     min_queries = int(args.min_queries)
+print(min_queries)
 
 # The root category, named Best Buy with id cat00000, doesn't have a parent.
 root_category_id = 'cat00000'
@@ -53,6 +54,17 @@ df['query'] = df['query'].apply(lambda x:x.lower())
 
 
 # IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
+
+category_value_counts= pd.DataFrame(df['category'].value_counts().reset_index().\
+                                    rename(columns = {"index": "category", "category": "category_count"}))
+faulty_categories = list(category_value_counts[category_value_counts['category_count'] < min_queries]['category'])
+
+while len(faulty_categories) > 0:
+    df.loc[df['category'].isin(faulty_categories), 'category'] = df['category'].\
+    map(parents_df.set_index('category')['parent'])
+    category_value_counts= pd.DataFrame(df['category'].value_counts().reset_index().\
+                                    rename(columns = {"index": "category", "category": "category_count"}))
+    faulty_categories = list(category_value_counts[category_value_counts['category_count'] < min_queries]['category'])
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
 
