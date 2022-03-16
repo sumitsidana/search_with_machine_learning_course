@@ -3,6 +3,7 @@ import random
 import xml.etree.ElementTree as ET
 import argparse
 from pathlib import Path
+from nltk.stem import SnowballStemmer
 
 directory = r'/workspace/search_with_machine_learning_course/data/pruned_products'
 parser = argparse.ArgumentParser(description='Process some integers.')
@@ -11,7 +12,7 @@ general.add_argument("--input", default=directory,  help="The directory containi
 general.add_argument("--output", default="/workspace/datasets/fasttext/titles.txt", help="the file to output to")
 
 # Consuming all of the product data takes a while. But we still want to be able to obtain a representative sample.
-general.add_argument("--sample_rate", default=0.1, type=float, help="The rate at which to sample input (default is 0.1)")
+general.add_argument("--sample_rate", default=0.9, type=float, help="The rate at which to sample input (default is 0.1)")
 
 args = parser.parse_args()
 output_file = args.output
@@ -27,6 +28,10 @@ sample_rate = args.sample_rate
 
 def transform_training_data(name):
     # IMPLEMENT
+    name = name.lower()
+    name = name.replace("'"," ")
+    stemmer = SnowballStemmer("english") # Choose a language
+    name = stemmer.stem(name) # Stem a word
     return name.replace('\n', ' ')
 
 # Directory for product data
